@@ -1,12 +1,6 @@
 package problems.tools;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
-/**
- * Created by lorenzo on 1/26/2017.
- */
 public class ESieve {
 
     public static int[] getPrimes(int upper) {

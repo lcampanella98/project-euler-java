@@ -4,8 +4,9 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.Buffer;
 
-public class Problem82 extends Problem {
+class Problem82 extends Problem {
 
     private int[][] matrix;
 
@@ -19,30 +20,52 @@ public class Problem82 extends Problem {
      */
     public String getSolution() {
         String fName = "res/p082_matrix.txt";
-        BufferedReader reader;
-        try {
-            reader = new BufferedReader(new FileReader(fName));
-        } catch (FileNotFoundException e) {
-            return "File not found";
-        }
-        int matrixSize = 80;
-        matrix = new int[matrixSize][matrixSize];
-        try {
+
+        try (BufferedReader r = new BufferedReader(new FileReader(fName))) {
             String line;
             String[] parts;
             int i = 0, j;
-            while (reader.ready()) {
-                line = reader.readLine();
+            while (r.ready()) {
+                line = r.readLine();
                 parts = line.split(",");
+                if (i == 0)
+                    matrix = new int[parts.length][parts.length];
                 for (j = 0; j < parts.length; j++)
                     matrix[i][j] = Integer.parseInt(parts[j]); // populate the matrix
                 i++;
             }
         } catch (IOException e) {
-            return "Error reading the file: " + e;
+            return "Error reading the file:\n" + e;
         }
 
         return getSmarterSolution();
+    }
+
+    /**
+     * Works by finding the shorted path sums between
+     *
+     * @return The shortest 3-way path sum for the matrix
+     */
+    private String getEvenSmarterSolution() {
+        int size = matrix.length;
+        int[] sum = new int[size]; // stores the currently shortest path sums
+        int i, j;
+        for (i = 0; i < size; i++) sum[i] = matrix[i][0];
+
+        for (j = 1; j < size; j++) {
+            sum[0] += matrix[0][j];
+            for (i = 1; i < size; i++) {
+                sum[i] = Math.min(matrix[i][j] + sum[i], matrix[i][j] + sum[i - 1]);
+            }
+
+            for (i = size - 2; i >= 0; i--) {
+                sum[i] = Math.min(sum[i], sum[i + 1] + matrix[i][j]);
+            }
+        }
+
+        int minPath = sum[0];
+        for (int pSum : sum) minPath = Math.min(minPath, pSum);
+        return "The minimum 3-way path sum is " + minPath;
     }
 
     /**
