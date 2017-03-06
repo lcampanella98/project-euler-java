@@ -1,9 +1,6 @@
 package problems;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.nio.Buffer;
 
 class Problem82 extends Problem {
@@ -38,7 +35,7 @@ class Problem82 extends Problem {
             return "Error reading the file:\n" + e;
         }
 
-        return getSmarterSolution();
+        return getEvenSmarterSolution();
     }
 
     /**
