@@ -1,9 +1,13 @@
 package problems;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.PriorityQueue;
 
-public class Problem83 extends Problem{
+public class Problem83 extends Problem {
 
     private class Node implements Comparable<Node> {
         List<Node> adj;
@@ -34,9 +38,10 @@ public class Problem83 extends Problem{
 
     public String getSolution() {
         String fName = "res/p083_matrix.txt";
-        int matrixLen = 80;
+        int size = 80;
         int i, j;
-        Node[][] matrix = new Node[matrixLen][matrixLen];
+        Node[][] matrix = new Node[size][size];
+
         try (BufferedReader r = new BufferedReader(new FileReader(fName))) {
             String[] line;
             i = 0;
@@ -50,29 +55,28 @@ public class Problem83 extends Problem{
         } catch (IOException e) {
             return "Error reading from file:\n" + e;
         }
-        // generate graph
 
+        // generate graph
         List<Node> adjTemp;
 
         for (i = 0; i < matrix.length; i++) {
             for (j = 0; j < matrix.length; j++) {
                 adjTemp = new ArrayList<>();
-                if (i > 0) adjTemp.add(matrix[i-1][j]);
-                if (j > 0) adjTemp.add(matrix[i][j-1]);
-                if (i < matrixLen - 1) adjTemp.add(matrix[i+1][j]);
-                if (j < matrixLen - 1) adjTemp.add(matrix[i][j+1]);
+                if (i > 0) adjTemp.add(matrix[i - 1][j]);
+                if (j > 0) adjTemp.add(matrix[i][j - 1]);
+                if (i < size - 1) adjTemp.add(matrix[i + 1][j]);
+                if (j < size - 1) adjTemp.add(matrix[i][j + 1]);
                 matrix[i][j].adj = adjTemp;
             }
         }
 
         // dijkstra
         PriorityQueue<Node> queue = new PriorityQueue<>();
-        Node start = matrix[0][0], end = matrix[matrixLen - 1][matrixLen - 1];
+        Node start = matrix[0][0], end = matrix[size - 1][size - 1];
         start.pathSum = start.val;
         queue.add(start);
         Node cur;
-        while (true) {
-            if ((cur = queue.poll()) == null) break;
+        while ((cur = queue.poll()) != null) {
             for (Node n : cur.adj) {
                 if (n.visited) continue;
                 if (cur.pathSum + n.val < n.pathSum) {
