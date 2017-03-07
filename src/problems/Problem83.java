@@ -62,30 +62,29 @@ public class Problem83 extends Problem {
         for (i = 0; i < matrix.length; i++) {
             for (j = 0; j < matrix.length; j++) {
                 adjTemp = new ArrayList<>();
-                if (i > 0) adjTemp.add(matrix[i - 1][j]);
-                if (j > 0) adjTemp.add(matrix[i][j - 1]);
-                if (i < size - 1) adjTemp.add(matrix[i + 1][j]);
-                if (j < size - 1) adjTemp.add(matrix[i][j + 1]);
+                if (i > 0) adjTemp.add(matrix[i - 1][j]); // add node above
+                if (i < size - 1) adjTemp.add(matrix[i + 1][j]); // add node below
+                if (j > 0) adjTemp.add(matrix[i][j - 1]); // add node left
+                if (j < size - 1) adjTemp.add(matrix[i][j + 1]); // add node right
                 matrix[i][j].adj = adjTemp;
             }
         }
 
-        // dijkstra
+        // dijkstra's algorithm
         PriorityQueue<Node> queue = new PriorityQueue<>();
         Node start = matrix[0][0], end = matrix[size - 1][size - 1];
         start.pathSum = start.val;
         queue.add(start);
         Node cur;
-        while ((cur = queue.poll()) != null) {
-            for (Node n : cur.adj) {
+        while ((cur = queue.poll()) != null) { // loop while the queue is not empty
+            for (Node n : cur.adj) { // go through unvisited adjacent nodes
                 if (n.visited) continue;
-                if (cur.pathSum + n.val < n.pathSum) {
+                if (cur.pathSum + n.val < n.pathSum) { // check for a smaller path sum
                     n.pathSum = cur.pathSum + n.val;
-                    n.bestPathNode = cur;
-                    queue.add(n);
+                    n.bestPathNode = cur; // at the end if we want, we can recreate the path
+                    queue.add(n); // insert the node into the queue
                 }
             }
-
             cur.visited = true;
         }
 

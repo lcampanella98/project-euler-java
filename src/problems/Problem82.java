@@ -1,14 +1,15 @@
 package problems;
 
-import java.io.*;
-import java.nio.Buffer;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 
 class Problem82 extends Problem {
 
     private int[][] matrix;
 
     /**
-     * We have an 80x80 matrix of positive integers.
+     * We have an square matrix of positive integers.
      * Finds the path with the minimum sum that travels
      * from the leftmost column of the matrix to the rightmost
      * column, where the path can move up, down, and right.
@@ -28,7 +29,7 @@ class Problem82 extends Problem {
                 if (i == 0)
                     matrix = new int[parts.length][parts.length];
                 for (j = 0; j < parts.length; j++)
-                    matrix[i][j] = Integer.parseInt(parts[j]); // populate the matrix
+                    matrix[i][j] = Integer.parseInt(parts[j]);
                 i++;
             }
         } catch (IOException e) {
@@ -39,7 +40,9 @@ class Problem82 extends Problem {
     }
 
     /**
-     * Works by finding the shorted path sums between
+     * Finds and accumulates the minimum path sums for each row element
+     * between each pair of columns.
+     * When we get to the final column we will have the shortest path sums.
      *
      * @return The shortest 3-way path sum for the matrix
      */
@@ -47,16 +50,25 @@ class Problem82 extends Problem {
         int size = matrix.length;
         int[] sum = new int[size]; // stores the currently shortest path sums
         int i, j;
-        for (i = 0; i < size; i++) sum[i] = matrix[i][0];
+        for (i = 0; i < size; i++) sum[i] = matrix[i][0]; // initialize sum
 
         for (j = 1; j < size; j++) {
-            sum[0] += matrix[0][j];
-            for (i = 1; i < size; i++) {
-                sum[i] = Math.min(matrix[i][j] + sum[i], matrix[i][j] + sum[i - 1]);
-            }
+            sum[0] += matrix[0][j]; // for top element, path comes from the left
 
-            for (i = size - 2; i >= 0; i--) {
-                sum[i] = Math.min(sum[i], sum[i + 1] + matrix[i][j]);
+            for (i = 1; i < size; i++) { // traverse down
+                sum[i] = Math.min(
+                        matrix[i][j] + sum[i], // path coming from the left
+                        matrix[i][j] + sum[i - 1]); // path coming from above
+            }
+            /*
+            traverse back up:
+            Here sum[size-1] is solved for since it only
+            has paths coming from the left and above.
+             */
+            for (i = size - 2; i > -1; i--) {
+                sum[i] = Math.min(
+                        sum[i], // minimum of paths coming from the left and above
+                        sum[i + 1] + matrix[i][j]); // path coming from below
             }
         }
 
