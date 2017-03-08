@@ -35,19 +35,23 @@ public class Problem83 extends Problem {
         }
     }
 
+    private Node[][] matrix;
+    private int size;
 
     public String getSolution() {
-        String fName = "res/p083_matrix.txt";
-        int size = 80;
+        String fName = "res/rand_matrix.txt";
         int i, j;
-        Node[][] matrix = new Node[size][size];
 
         try (BufferedReader r = new BufferedReader(new FileReader(fName))) {
             String[] line;
             i = 0;
             while (r.ready()) {
                 line = r.readLine().split(",");
-                for (j = 0; j < line.length; j++) {
+                if (i == 0) {
+                    size = line.length;
+                    matrix = new Node[size][size];
+                }
+                for (j = 0; j < size; j++) {
                     matrix[i][j] = new Node(Integer.parseInt(line[j]));
                 }
                 ++i;
@@ -90,7 +94,4 @@ public class Problem83 extends Problem {
 
         return "The best 4-way path sum was " + end.pathSum;
     }
-
-
 }
-

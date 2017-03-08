@@ -1,6 +1,11 @@
 package problems;
 
 
+import java.io.IOError;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Random;
+
 public class Main {
 
     public static void main(String[] args) {
@@ -8,8 +13,9 @@ public class Main {
 
         if (args.length > 0) {
             try {
-                p = (Problem) Main.class.getClassLoader().loadClass("Problem"+args[0]).newInstance();
+                p = (Problem) Main.class.getClassLoader().loadClass("problems.Problem" + args[0]).newInstance();
             } catch (InstantiationException | IllegalAccessException | ClassNotFoundException ignored) {
+                System.out.println("Invalid problem");
             }
         }
 

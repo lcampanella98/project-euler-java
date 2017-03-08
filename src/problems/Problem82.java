@@ -7,6 +7,7 @@ import java.io.IOException;
 class Problem82 extends Problem {
 
     private int[][] matrix;
+    private int size;
 
     /**
      * We have an square matrix of positive integers.
@@ -26,9 +27,11 @@ class Problem82 extends Problem {
             while (r.ready()) {
                 line = r.readLine();
                 parts = line.split(",");
-                if (i == 0)
-                    matrix = new int[parts.length][parts.length];
-                for (j = 0; j < parts.length; j++)
+                if (i == 0) {
+                    size = parts.length;
+                    matrix = new int[size][size];
+                }
+                for (j = 0; j < size; j++)
                     matrix[i][j] = Integer.parseInt(parts[j]);
                 i++;
             }
@@ -36,116 +39,71 @@ class Problem82 extends Problem {
             return "Error reading the file:\n" + e;
         }
 
-        return getEvenSmarterSolution();
+        return getSmarterSolution();
     }
 
     /**
-     * Finds and accumulates the minimum path sums for each row element
-     * between each pair of columns.
-     * When we get to the final column we will have the shortest path sums.
+     * Breaks the problem down by finding the minimum path sums for each successive column
+     * and using that result for the next column
      *
-     * @return The shortest 3-way path sum for the matrix
-     */
-    private String getEvenSmarterSolution() {
-        int size = matrix.length;
-        int[] sum = new int[size]; // stores the currently shortest path sums
-        int i, j;
-        for (i = 0; i < size; i++) sum[i] = matrix[i][0]; // initialize sum
-
-        for (j = 1; j < size; j++) {
-            sum[0] += matrix[0][j]; // for top element, path comes from the left
-
-            for (i = 1; i < size; i++) { // traverse down
-                sum[i] = Math.min(
-                        matrix[i][j] + sum[i], // path coming from the left
-                        matrix[i][j] + sum[i - 1]); // path coming from above
-            }
-            /*
-            traverse back up:
-            Here sum[size-1] is solved for since it only
-            has paths coming from the left and above.
-             */
-            for (i = size - 2; i > -1; i--) {
-                sum[i] = Math.min(
-                        sum[i], // minimum of paths coming from the left and above
-                        sum[i + 1] + matrix[i][j]); // path coming from below
-            }
-        }
-
-        int minPath = sum[0];
-        for (int pSum : sum) minPath = Math.min(minPath, pSum);
-        return "The minimum 3-way path sum is " + minPath;
-    }
-
-    /**
-     * Breaks the problem down by finding the minimum path sums for each pair of columns
-     * and using that result for the next pair
-     *
-     * @return The answer
+     * @return The minimum 3-way path sum
      */
     private String getSmarterSolution() {
 
-        for (int col = 1; col < matrix.length; col++) minColumnPathSum(col);
+        // the minimum path sums to get to the 0th column are already "solved"
+        for (int col = 1; col < size; col++)
+            minColumnPathSum(col);
 
-        int minPathSum = minInCol(matrix.length - 1); // find the minimum path sum in the final column
+        int finalColumn = size - 1;
 
-        return "The minimum 3-way path sum is " + minPathSum;
+        int min = matrix[0][finalColumn];
+        for (int row = 1; row < size; row++)
+            min = Math.min(min, matrix[row][finalColumn]);
+
+        return "The minimum 3-way path sum is " + min;
     }
 
     /**
-     * Find the minimum path sums going from column colIndex - 1
-     * to column colIndex for each element in the column
-     * (with the path moving only up, down, and right), and
-     * overwrite the column in the matrix to those minimum path sums.
+     * Finds the minimum path sums to get to each element in (col)
+     * with the path moving only up, down, and right.
      *
-     * @param colIndex The column for which we want to find
-     *                 the minimum path sums
+     * Assumes that the previous column (col-1) contains
+     * the minimum path sums to get to its respective elements.
+     *
+     * Overwrites the column in the matrix to the newly found minimum path sums.
+     *
+     * @param col The column for which we want to find
+     *            the minimum path sums
      */
-    private void minColumnPathSum(int colIndex) {
-        if (colIndex < 1 || colIndex >= matrix.length) return; // colIndex out of bounds
+    private void minColumnPathSum(int col) {
 
-        int[] newMinCol = new int[matrix.length]; // create a temporary array for the new path sum column
-        int row, row2, sum, accumulatedColSum;
+        int[] newCol = new int[size]; // temp array for the path sums to each respective element in the column
 
-        for (row = 0; row < matrix.length; row++) { // loop through each element in the column
+        newCol[0] =
+                matrix[0][col] // first element in current column
+                + matrix[0][col - 1]; // path sum coming from the left
 
-            if (row > 0) // initialize the minimum path to the minimum path found directly "above"
-                newMinCol[row] = newMinCol[row - 1] + matrix[row][colIndex];
-            else
-                newMinCol[row] = Integer.MAX_VALUE; // minimum path "above" is effectively infinity for first element
-
-            accumulatedColSum = 0; // stores sum of elements in the column from index row to index row2
-            for (row2 = row; row2 < matrix.length; row2++) { // check the path to the "left" and the paths "below"
-                accumulatedColSum += matrix[row2][colIndex];
-
-                // only continue if there is a possibility of getting a new minimum path sum
-                if (accumulatedColSum < newMinCol[row]) {
-                    sum = accumulatedColSum + matrix[row2][colIndex - 1]; // complete the path
-                    newMinCol[row] = Math.min(newMinCol[row], sum); // take the minimum of previous and current sums
-                } else break;
-            }
+        int row;
+        for (row = 1; row < matrix.length; row++) { // traverse down, while looking up and left
+            newCol[row] = Math.min(
+                    newCol[row - 1], // path from above
+                    matrix[row][col - 1]) // path from the left
+                    + matrix[row][col];
         }
-        for (row = 0; row < matrix.length; row++) // copy new minimum path sum column into the matrix
-            matrix[row][colIndex] = newMinCol[row];
-    }
+        for (row = matrix.length - 2; row > -1; row--) { // traverse up, while looking down
+            newCol[row] = Math.min(
+                    newCol[row], // smallest path looking up and left
+                    newCol[row + 1] + matrix[row][col]); // path from below
+        }
 
-    /**
-     * Find the minimum element in column c of the matrix
-     *
-     * @param c The column in which to find the minimum element
-     * @return The minimum element in column c
-     */
-    private int minInCol(int c) {
-        int min = matrix[0][c];
-        for (int r = 1; r < matrix.length; r++)
-            min = Math.min(min, matrix[r][c]);
-        return min;
+        for (row = 0; row < matrix.length; row++) // copy new path sum column into matrix
+            matrix[row][col] = newCol[row];
     }
 
     /**
      * Brute force the problem by checking every path
      *
-     * @return The answer
+     * @return The minimum 3-way path sum
      */
     private String bruteForce() {
         minSum = Integer.MAX_VALUE;
