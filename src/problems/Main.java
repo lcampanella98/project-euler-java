@@ -1,11 +1,6 @@
 package problems;
 
 
-import java.io.IOError;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Random;
-
 public class Main {
 
     public static void main(String[] args) {

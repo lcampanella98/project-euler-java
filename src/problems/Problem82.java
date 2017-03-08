@@ -66,10 +66,10 @@ class Problem82 extends Problem {
     /**
      * Finds the minimum path sums to get to each element in (col)
      * with the path moving only up, down, and right.
-     *
+     * <p>
      * Assumes that the previous column (col-1) contains
      * the minimum path sums to get to its respective elements.
-     *
+     * <p>
      * Overwrites the column in the matrix to the newly found minimum path sums.
      *
      * @param col The column for which we want to find
@@ -81,7 +81,7 @@ class Problem82 extends Problem {
 
         newCol[0] =
                 matrix[0][col] // first element in current column
-                + matrix[0][col - 1]; // path sum coming from the left
+                        + matrix[0][col - 1]; // path sum coming from the left
 
         int row;
         for (row = 1; row < matrix.length; row++) { // traverse down, while looking up and left
