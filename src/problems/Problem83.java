@@ -39,7 +39,7 @@ public class Problem83 extends Problem {
     private int size;
 
     public String getSolution() {
-        String fName = "res/rand_matrix.txt";
+        String fName = "res/p083_matrix.txt";
         int i, j;
 
         try (BufferedReader r = new BufferedReader(new FileReader(fName))) {
