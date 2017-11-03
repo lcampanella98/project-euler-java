@@ -4,7 +4,7 @@ package problems;
 public class Main {
 
     public static void main(String[] args) {
-        Problem p = new Problem82();
+        Problem p = new Problem99();
 
         if (args.length > 0) {
             try {
